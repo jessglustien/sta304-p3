@@ -1,0 +1,139 @@
+---
+title: "Estimating the result of 2020 US presidential election"
+author: "Jessica Glustien, Nick Callow, Olivia Bi, Min Zhang"
+date: "2 November 2020"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Title of your Report
+
+## Name(s) of Author(s) 
+## Date
+
+
+# Model
+
+
+
+## Model Specifics
+
+#Trump or not trump
+
+```{r}
+library(tidyverse)
+setwd("/Users/ZHANGMIN/Desktop")
+
+survey_data <- read_csv("survey_data.csv")
+census_data <- read_csv("census_data.csv")
+
+# Creating the Model: Trump or not Trump
+model_1 <- glm(vote_trump ~ age+as.factor(sex)+as.factor(race)+as.factor(education), 
+            data=survey_data, family= "binomial")
+summary(model_1)    # age >= 18
+
+```
+
+## Post-Stratification 
+
+In order to estimate the proportion of voters who will vote for Donald Trump I need to perform a post-stratification analysis. Here I create cells based off different ages, race, eduction level. Using the model described in the previous sub-section I will estimate the proportion of voters in each age bin. I will then weight each proportion estimate (within each bin) by the respective population size of that bin and sum those values and divide that by the entire population size. 
+
+```{r}
+# Here I will perform the post-stratification calculation
+census_data$logodds_estimate <-
+  model_1 %>%
+  predict(newdata = census_data)
+
+census_data$estimate <-
+  exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+
+census_data %>%
+  mutate(trump_predict_prop = estimate*n) %>% 
+  summarise(trump_predict = sum(trump_predict_prop)/sum(n))
+
+
+```
+
+
+#biden or not biden
+
+```{r}
+library(tidyverse)
+setwd("/Users/ZHANGMIN/Desktop")
+survey_data <- read_csv("survey_data.csv")
+census_data <- read_csv("census_data.csv")
+
+# Creating the Model: Biden or not Biden
+model_2 <- glm(vote_biden ~ age+as.factor(sex)+as.factor(race)+as.factor(education), 
+            data=survey_data, family= "binomial")
+summary(model_2)    # age >= 18
+```
+
+```{r}
+census_data$logodds_est <-
+  model_2 %>%
+  predict(newdata = census_data)
+
+census_data$estimate <-
+  exp(census_data$logodds_est)/(1+exp(census_data$logodds_est))
+
+census_data <-
+  census_data %>% 
+  mutate(biden_predict_prop = estimate*n) %>% 
+  summarise(biden_predict = sum(biden_predict_prop)/sum(n))
+view(census_data)
+```
+
+#Trump or Biden: 
+
+```{r}
+library(tidyverse)
+setwd("/Users/ZHANGMIN/Desktop")
+survey_data <- read_csv("survey_data_2.csv") # data only contain voters who will vote for Biden or Trump. 
+census_data <- read_csv("census_data.csv")
+
+# Creating the Model: Trump or Biden
+model_3 <- glm(biden_or_trump ~ age+as.factor(sex)+as.factor(race)+as.factor(education), 
+            data=survey_data, family= "binomial")
+summary(model_3)    # age >= 18
+```
+
+```{r}
+census_data$logodds_est <-
+  model_3 %>%
+  predict(newdata = census_data)
+
+census_data$estimate <-
+  exp(census_data$logodds_est)/(1+exp(census_data$logodds_est))
+
+election_result <-
+  census_data %>% 
+  mutate(biden_win = estimate*n) %>% 
+  summarise(biden_or_trump = sum(biden_win)/sum(n))
+view(election_result)
+```
+
+# Results
+
+
+# Discussion
+
+Here you will summarize the previous sections and discuss conclusions drawn from the results. Make sure to elaborate and connect your analysis to the goal of the study.
+
+## Weaknesses
+
+Here we discuss weaknesses of the study, data, analysis, etc. You can also discuss areas for improvement.
+
+## Next Steps
+
+Here you discuss subsequent work to be done after this report. This can include next steps in terms of statistical analysis (perhaps there is a more efficient algorithm available, or perhaps there is a caveat in the data that would allow for some new technique). Future steps should also be specified in terms of the study setting (eg. including a follow-up survey on something, or a subsequent study that would complement the conclusions of your report).
+
+
+# References
+
+
+
