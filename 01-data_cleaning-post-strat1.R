@@ -53,9 +53,7 @@ reduced_data <-
 reduced_data <- 
   reduced_data %>% 
   filter(age != "less than 1 year old") %>%
-  filter(age != "90 (90+ in 1980 and 1990)") %>% 
-  filter(race != "two major races") %>% 
-  filter(race != "three or more major races") 
+  filter(age != "90 (90+ in 1980 and 1990)")
 
 colnames(reduced_data)[4] <- "education"
 
@@ -85,6 +83,17 @@ reduced_data$education[reduced_data$education=="bachelor's degree"] <- 'College 
 reduced_data$education[reduced_data$education== "master's degree"] <- 'Masters degree'
 reduced_data$education[reduced_data$education=="professional degree beyond a bachelor's degree"] <- 'Masters degree'
 reduced_data$education[reduced_data$education=='doctoral degree'] <- 'Doctorate degree'
+
+#update race
+reduced_data$race <- as.character(reduced_data$race)
+reduced_data$race[reduced_data$race=='two major races'] <- 'other race, nec'
+reduced_data$race[reduced_data$race=='three or more major races'] <- 'other race, nec'
+
+
+
+
+
+
 
 
 
