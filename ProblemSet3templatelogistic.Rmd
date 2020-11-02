@@ -1,15 +1,22 @@
 ---
-Title: "Undecided Voters Hold Key To 2020 Election"
-Author: "Nick Callow, Jessica Glustein, Olivia Bi, Min Zhang"
-Date: "November 2, 2020"
-
-Abstract: "On November 3, 2020, Americans will go to the polls to elect their next President. Republican incumbent Donald Trump is seeking re-election against Democratic Nominee and former Vice-President Joe Biden. In this paper, we strive to answer one question, who will win one of the most contested presidential elections in history? In service of this goal, we employ three logistic regression models with post-stratification. Comparing these three results, we determine there is no clear winner of the popular vote, and undecided voters will play a large role in the outcome. Code and data supporting this analysis are available at https://github.com/jessglustien/sta304-p3"
-
+title: Undecided Voters Hold Key To 2020 Election
+author: Nick Callow, Jessica Glustein, Olivia Bi, Min Zhang
+date: November 2, 2020
 output:
-  pdf_document: default
   html_document:
     df_print: paged
 ---
+
+# Abstract 
+
+On November 3, 2020, Americans will go to the polls to elect their next
+  President. Republican incumbent Donald Trump is seeking re-election against Democratic
+  Nominee and former Vice-President Joe Biden. In this paper, we strive to answer
+  one question, who will win one of the most contested presidential elections in history?
+  In service of this goal, we employ three logistic regression models with post-stratification.
+  Comparing these three results, we determine there is no clear winner of the popular
+  vote, and undecided voters will play a large role in the outcome. Code and data
+  supporting this analysis are available at https://github.com/jessglustien/sta304-p3
 
 # Model
 
@@ -36,9 +43,13 @@ $$
 # Results
 
 Trump or Biden: 
+Table 1
 ```{r,include=FALSE}
 library(tidyverse)
-setwd("/Users/ZHANGMIN/Desktop")
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+
 survey_data <- read_csv("survey_data_2.csv") # data only contain voters who will vote for Biden or Trump. 
 census_data <- read_csv("census_data.csv")
 
@@ -48,7 +59,7 @@ model_1 <- glm(biden_or_trump ~ age+as.factor(sex)+as.factor(race)+as.factor(edu
 summary(model_1)    # age >= 18
 ```
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 census_data$logodds_est <-
   model_1 %>%
   predict(newdata = census_data)
@@ -60,13 +71,13 @@ model_1_result <-
   census_data %>% 
   mutate(biden_win = estimate*n) %>% 
   summarise(biden_or_trump = sum(biden_win)/sum(n))
+tab_model(model_1)
 model_1_result
 ```
 
 Trump or not Trump:
+Table 2
 ```{r, include=FALSE}
-library(tidyverse)
-setwd("/Users/ZHANGMIN/Desktop")
 
 survey_data <- read_csv("survey_data.csv")
 census_data <- read_csv("census_data.csv")
@@ -78,13 +89,15 @@ summary(model_2)    # age >= 18
 
 ```
 
-```{r}
+```{r echo=FALSE}
 census_data$logodds_estimate <-
   model_2 %>%
   predict(newdata = census_data)
 
 census_data$estimate <-
   exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+
+tab_model(model_2)
 
 census_data %>%
   mutate(trump_predict_prop = estimate*n) %>% 
@@ -93,9 +106,8 @@ census_data %>%
 ```
 
 Biden or not Biden:
-```{r}
-library(tidyverse)
-setwd("/Users/ZHANGMIN/Desktop")
+Table 3
+```{r include=FALSE}
 survey_data <- read_csv("survey_data.csv")
 census_data <- read_csv("census_data.csv")
 
@@ -105,7 +117,7 @@ model_3 <- glm(vote_biden ~ age+as.factor(sex)+as.factor(race)+as.factor(educati
 summary(model_3)    # age >= 18
 ```
 
-```{r}
+```{r echo=FALSE}
 census_data$logodds_est <-
   model_3 %>%
   predict(newdata = census_data)
@@ -117,19 +129,11 @@ model_3_result <-
   census_data %>% 
   mutate(biden_predict_prop = estimate*n) %>% 
   summarise(biden_predict = sum(biden_predict_prop)/sum(n))
+tab_model(model_3)
 model_3_result
 ```
 
 Based on three models above, we estimate that the proportion of voters in favor of voting for Joe Biden to be 0.507. This is based off our post-stratification analysis of the proportion of voters in favor of Joe Biden modelled by a logistic regression model, which accounted for age, sex, race and education.
-
-```{r}
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-tab_model(model_1)
-tab_model(model_2)
-tab_model(model_3)
-```
 
 # Discussion
 
