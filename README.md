@@ -1,1 +1,1 @@
-# sta304-p3
+# Estimating the 2020 US Presidential Election
