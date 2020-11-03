@@ -1,0 +1,96 @@
+---
+title: "Predicting the 2020 US Presidential Popular Vote"
+author: "Nick Callow, Jessica Glustein, Olivia Bi, Charles Zhang"
+date: "November 2, 2020"
+abstract: "On November 3, 2020, Americans will go to the polls to elect their next President. Republican incumbent Donald Trump is seeking re-election against Democratic Nominee and former Vice-President Joe Biden. In this paper, we strive to answer one question, who will win one of the most contested presidential elections in history? In service of this goal, we employ three logistic regression models with post-stratification. Comparing these three results, we determine there is no clear winner of the popular vote, and undecided voters will play a large role in the outcome. Code and data supporting this analysis are available at https://github.com/jessglustien/sta304-p3"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+# Model
+
+Our election prediction rests on three separate logistic regression models, each with different assumptions about undecided voters. We selected logistic regression, given the binary nature of our outcome variables (Caetano, 2020a). Likewise, we chose a Frequentist over the Bayesian approach since we have no prior information about the distribution of the variables of interest (Caetano, 2020b). The first model examines the strength of each candidate's base. As such, sampled individuals who indicated no known preference for either candidate, known as undecided voters, are excluded from the analysis. The second model assumes that all undecided voters in the sample data swing to Trump, while the third makes the opposite assumption. Please refer to Table 1 for a more thorough breakdown of the three models.
+
+##### Table 1: Model Breakdown
+
+Model        Outcome Variable    Reference Level      Description
+------------ ------------------- -------------------- ----------------------------------------------------------
+Model I      Vote Biden          Vote Trump                In this model, we exclude undecided voters from the analysis.
+Model II     Vote Biden          Vote *Not* Biden          In this model, we assume that Trump receives all of the   undecided voters. Therefore, *Not* Biden includes sampled individuals who indicated they would vote for Trump and people who responded with "I don't know."
+Model III    Vote Trump          Vote *Not* Trump          In this model, we assume that Biden receives all of the undecided voters. Therefore, *Not* Trump includes sampled individuals who indicated they would vote for Biden and people who responded with "I don't know."
+
+## Model Specifics
+
+Our explanatory variables are static across all three models to make useful comparisons between these approaches. Therefore, each model takes the following mathematical form. Please refer to Table 2 for a breakdown of each variable and its associated categories, if applicable.
+
+$$
+\begin{equation}
+  \log\bigg(\frac{\hat{p}}{1-\hat{p}}\bigg) = \hat{\beta}_0 + \hat{\beta}_1x_1 + \hat{\beta}_2x_2 + \underbrace{\Big(\hat{\beta}_3x_{3,1} + \dots + \hat{\beta}_8x_{3,6}\Big)}_{\text{Race Categorical Variables}} + \underbrace{\Big(\hat{\beta}_9x_{4,1} + \dots + \hat{\beta}_{17}x_{4,10} \Big)}_{\text{Education Categorical Variables}}
+\end{equation}
+$$
+
+##### Table 2: Breakdown of Variable Categories
+
+Notation   Variable         Category                                   Reference Level 
+---------  ---------------  ------------------------------------------ -----------------------------------------
+$x_1$      Age              Not Applicable - Continuous Variable       Not Applicable - Continuous Variable
+$x_2$      Sex              Male                                       Female
+$x_{3,1}$  Race             Black/African American                     American Indian or Alaskan Native
+$x_{3,2}$  Race             Chinese                                    American Indian or Alaskan Native
+$x_{3,3}$  Race             Japanese                                   American Indian or Alaskan Native
+$x_{3,4}$  Race             Other Asian/Pacific Islander               American Indian or Alaskan Native
+$x_{3,5}$  Race             White                                      American Indian or Alaskan Native
+$x_{4,1}$  Education        Associate Degree                           Third Grade or Less
+$x_{4,2}$  Education        College Degree (e.g. BA/BS)                Third Grade or Less
+$x_{4,3}$  Education        Completed some college, no degree          Third Grade or Less
+$x_{4,4}$  Education        Completed some graduate, no degree         Third Grade or Less
+$x_{4,5}$  Education        Completed some highschool, no degree       Third Grade or Less
+$x_{4,6}$  Education        Doctorate Degree                           Third Grade or Less
+$x_{4,7}$  Education        High School Graduate                       Third Grade or Less
+$x_{4,8}$  Education        Masters Degree                             Third Grade or Less
+$x_{4,9}$  Education        Middle School - Grades 4-8                 Third Grade or Less
+$x_{4,10}$ Education        Other post high school vocational training Third Grade or Less
+
+This equation's left side is the log-odds of a binary result, where $p$ is the probability of our event of interest happening (Caetano, 2020a). In the first model, the left side represents the log-odds of an individual voting for Biden instead of Trump. Similarly, we can interpret this expression in the second and third models as the log-odds of an individual voting for one of the candidates or not. These last two approaches imply that undecided voters will vote for the other candidate.  For example, not voting for Biden means voting for Trump. 
+
+The slope coefficients $\beta_1, \dots, \beta_{17}$ represent the change in log-odds attributed to its associated predictor variable $x_1, \dots, x_{4,10}$ (Caetano, 2020a). We include four predictor variables in each model, including age, sex, race, and education. Therefore, in Model I, $\beta_1$ represents the change in log-odds that an individual aged $x_1$ will vote for Joe Biden. Likewise, in Model II, $\beta_2$ represents the change in log-odds that female- relative to a male-identifying individual will vote for Donald Trump. Finally, $\beta_0$ is the intercept of our logistic regression model. It represents the log-odds of our binary result outcome variable, given that all of our predictor variables are zero. For example, in Model I, it represents the log-odds that an individual who is eighteen, male, white, in the lowest income bracket, and the lowest level of education will vote for Joe Biden.
+
+Our selection of these four explanatory variables boils down to consistent research findings that each of these sociodemographic characteristics influences voting behaviour. For instance, Pew Research (2018) concluded that women were more likely to identify with the democratic party than their male counterparts. Likewise, this same study found significant voter discrepancies by race, with visible minorities more likely to vote democratic, education, with higher educational attainment associated with democratic party support, and a substantial generational divide, with younger individuals strongly favouring the democratic party (Pew Research, 2018). Given the significance of these characteristics to election outcomes, they warranted inclusion in our models. The sample data for this model comes from the Nationscape Data Set, a public opinion poll surveying individuals in nearly all congressional districts in advance of election day (Tausanovitch & Vavreck, 2020).
+
+## Post-stratification
+
+In this paper, we will use a post-stratification technique. The purpose of this approach is to extrapolate from our sample data how the entire population will vote in the presidential election using census data (Caetano, 2020c). For this analysis, we will use the American Community Survey (ACS) as your census data. The goal is to calculate $\hat{y}^{PS}$ using the following equation.
+
+$$
+\begin{equation}
+\hat{y}^{PS} = \frac{\sum N_j\hat{y}_j}{\sum N_j}
+\end{equation}
+$$
+
+We can break down the post-stratification process into three steps. First, we divide our sample data into $j$ cells based on our predictor variables (Caetano, 2020c). We describe each bin by some combination of responses to our explanatory variables. This paper has four such variables: age, sex, race, and education. Therefore, one cell will contain all eighteen-year-old white males with a college degree. Another will hold all fifty-year-old black women with a masters degree. These examples could continue as we enumerate through every possible combination of answers to our predictor variables. 
+
+Second, we estimate our response variable for each cell, $\hat{y}_j$ using our logistic regression model (Caetano, 2020c). For example, in Model I, we estimate the probability that an individual will vote for Biden over Trump for each bin. Third, we multiply the estimate by the population size, $N_j$, and divide by the total population size, $\sum N_j$ (Caetano, 2020c). 
+
+## Inclusions and Exclusions
+
+*Inclusions Decisions:* Readers will note that included in the sample are individuals with less than a eigth grade education. We elected to keep these individuals in the model for two reasons. First, under extreme social conditions, such as poverty or homelessness, it is possible to fall through the cracks of the American education system. Therefore, excluding these individuals who taint the results, and diminish their lived experiences. Second, in the event that individuals misrepresented, either intentionally or unintentionally, their level of education, this would not change the outcome in a significant way. In post-stratification analysis, we found that the number of individuals in these categories (third grade or less and middle school).
+
+*Exclusion Decisions:* In this analysis, we elected to exclude people aged seventeen and younger given there ineligiblity to vote in the presidential election. Including these individuals would have skewed the model, especially given our findings (see Discussion) that younger individuals tend to vote Democrat.
+
+## References
+
+Caetano, S. (2020a, October 5). *Introduction to Logistic Regression* [PowerPoint Slides]. Quercus. https://q.utoronto.ca/courses/184060/files/9309406?module_item_id=1855302
+
+Caetano, S. (2020b, October 12). *Introduction to Bayesian Inference* [PowerPoint Slides]. Quercus. https://q.utoronto.ca/courses/184060/files/9490196?module_item_id=1872494
+
+Caetano, S. (2020c, October 19). *Multilevel Regression and Post-Stratification* [PowerPoint Slides]. Quercus. https://q.utoronto.ca/courses/184060/files/9490196?module_item_id=1872494
+
+Tausanovitch, C., & Vavreck, L. (2020, October 28). Nationscape Data Set. Retrieved October 30, 2020, from https://www.voterstudygroup.org/publication/nationscape-data-set
+
+Pew Research. (2020, August 28). Trends in Party Affiliation Among Demographic Groups. Retrieved October 29, 2020, from https://www.pewresearch.org/politics/2018/03/20/1-trends-in-party-affiliation-among-demographic-groups/
+
+
+
