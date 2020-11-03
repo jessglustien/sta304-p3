@@ -243,7 +243,11 @@ Rohan Alexander and Sam Caetano. (2020) 01-data_cleaning-survey1
 
 Steven Ruggles, Sarah Flood, Ronald Goeken, Josiah Grover, Erin Meyer, Jose Pacas and Matthew Sobek. IPUMS USA: Version 10.0 [dataset]. Minneapolis, MN: IPUMS, 2020. https://doi.org/10.18128/D010.V10.0
 
+Tausanovitch, Chris and Lynn Vavreck. Democracy Fund + UCLA Nationscape: Version 20200814 [dataset].
+
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
+
+
 
 
 
