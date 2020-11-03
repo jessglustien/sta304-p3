@@ -1,11 +1,11 @@
  #### Preamble ####
-# Purpose: Prepare and clean the survey data downloaded from [...UPDATE ME!!!!!]
-# Author: Rohan Alexander and Sam Caetano [CHANGE THIS TO YOUR NAME!!!!]
-# Data: 22 October 2020
-# Contact: rohan.alexander@utoronto.ca [PROBABLY CHANGE THIS ALSO!!!!]
+# Purpose: Prepare and clean the survey data downloaded from NationScape
+# Author: Nick Callow, Jessica Glustein, Olivia Bi, Min Zhang
+# Data: 02 November 2020
+# Contact: jessica.glustien@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-# - Need to have downloaded the data from X and save the folder that you're 
+# - Need to have downloaded the data from NationScape and save the folder that you're 
 # interested in to inputs/data 
 # - Don't forget to gitignore it!
 
@@ -14,7 +14,6 @@
 library(haven)
 library(tidyverse)
 
-setwd("/Users/ZHANGMIN/Desktop")
 # Read in the raw data (You might need to change this if you use a different dataset)
 raw_data <- read_dta("ns20200625.dta")
 # Add the labels
@@ -56,12 +55,6 @@ reduced_data<-
   reduced_data %>%
   mutate(someone_else = 
            ifelse(vote_2020=="Someone else", 1, 0))
-
-#reduced_data<-
- # reduced_data %>%
-  #filter(vote_2020=="Joe Biden" | vote_2020=="Donald Trump") %>% 
-  #mutate(biden_or_trump = 
-   #        ifelse(vote_2020=="Joe Biden", 1, 0))
 
 colnames(reduced_data)[3] <- "sex"
 colnames(reduced_data)[4] <- "race"

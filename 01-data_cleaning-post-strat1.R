@@ -1,8 +1,8 @@
 #### Preamble ####
-# Purpose: Prepare and clean the survey data downloaded from [...UPDATE ME!!!!!]
-# Author: Rohan Alexander and Sam Caetano [CHANGE THIS TO YOUR NAME!!!!]
-# Data: 22 October 2020
-# Contact: rohan.alexander@utoronto.ca [PROBABLY CHANGE THIS ALSO!!!!]
+# Purpose: Prepare and clean the census data downloaded from American Community Survey
+# Author: Nick Callow, Jessica Glustein, Olivia Bi, Min Zhang
+# Data: 02 November 2020
+# Contact: jessica.glustien@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
 # - Need to have downloaded the ACS data and saved it to inputs/data
@@ -15,7 +15,6 @@ library(tidyverse)
 library(stringr)
 # Read in the raw data.
 
-setwd("/Users/ZHANGMIN/Desktop")
 raw_data <- read_dta("usa_00002.dta")
 
 
@@ -37,13 +36,6 @@ reduced_data <-
          educd,
          #labforce,
          inctot)
-         
-
-#### What's next? ####
-
-## Here I am only splitting cells by age, but you 
-## can use other variables to split by changing
-## count(age) to count(age, sex, ....)
 
 reduced_data <- 
   reduced_data %>%
